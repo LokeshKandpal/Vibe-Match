@@ -67,32 +67,25 @@ const userSchema = new mongoose.Schema({
     skills: {
         type: [String],
     }
-}, { timestamps: true, },
-
-
-    userSchema.methods.getJWT = async function () {
-         
-        const user = this;
-        const token = jwt.sign({ _id: user._id }, "DEVTINDER@$18", { expiresIn: "1d", });
-
-        return token;
-    } ,
-
-    userSchema.methods.validatePassword = async function( passwordInputByUser){
-        const user = this;
-        const hashPassword = user.password ;
-
-        const isPasswordValid = await bcrypt.compare(passwordInputByUser, hashPassword)
-         
-        return isPasswordValid;
-    }
-        
-       
-
+}, 
+  { 
+    timestamps: true,
+  },
 
 );
+        userSchema.methods.getJWT = async function () {  
+                const user = this;
+                const token = jwt.sign({ _id: user._id }, "DEVTINDER@$18", { expiresIn: "1d", });
+                return token;
+              } ,
 
-
+    userSchema.methods.validatePassword = async function( passwordInputByUser){
+                const user = this;
+                const hashPassword = user.password ;
+                const isPasswordValid = await bcrypt.compare(passwordInputByUser, hashPassword)
+                return isPasswordValid;
+            }
+        
 // ! Crating a model
 const User = mongoose.model("User", userSchema);
 

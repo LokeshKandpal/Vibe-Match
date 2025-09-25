@@ -11,12 +11,23 @@ const validateSignupData = (req) => {
     else if (!validator.isEmail(email)) {
         throw new Error("Email is invalid")
     }
- 
+
     else if (!validator.isStrongPassword(password)) {
         throw new Error("Please Enter a strong password")
     }
 
 };
 
+const validateEditProfileData = (req) => {
+    const allowedEditFields = ["firstName", "lastName", "email", "age", "gender", "about", "photoUrl", "skills",];
 
-module.exports = { validateSignupData, };
+    const isEditAllowed = Object.keys(req.body).every((field) =>
+        allowedEditFields.includes(field)
+    );
+
+    return isEditAllowed;
+}
+module.exports = {
+    validateSignupData,
+    validateEditProfileData,
+};
