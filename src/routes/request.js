@@ -2,6 +2,7 @@ const express = require("express");
 const { userAuth } = require("../middleware/auth");
 const { ConnectionRequestModel } = require("../models/connectionRequest");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 const requestRouter = express.Router();
 
@@ -79,8 +80,8 @@ requestRouter.post(
 
          //validating the request
          const connectionRequest = await ConnectionRequestModel.findOne({
-            _id: requestId,
-            toUserId: loggedInUser._id,
+            _id: new mongoose.Types.ObjectId(requestId),
+            toUserId: new mongoose.Types.ObjectId(loggedInUser._id),
             status: "interested",
          });
 
@@ -92,10 +93,14 @@ requestRouter.post(
          }
 
          connectionRequest.status = status;
+         
+         // Get the user who sent the request for a more detailed response message
+         const fromUser = await User.findById(connectionRequest.fromUserId);
+         
          const data = await connectionRequest.save();
 
          res.status(200).json({
-            message: "Connection request " + status,
+            message: fromUser.firstName + "'s connection request " + status,
             data,
             success: true,
          });
