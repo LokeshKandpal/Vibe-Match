@@ -19,8 +19,16 @@ authRouter.post('/signup', async (req, res) => {
 
         // creating a new instancce of the user model
         const user = new User({ firstName, lastName, email, password: hashPassword, })
-        await user.save();
-        res.send("User added successfully")
+       
+        const savedUser = await user.save();
+
+         const token  = await savedUser.getJWT();
+         res.cookie("token" , token ,{
+            expires : new Date(Date.now() + 8 * 3600000)
+         });
+
+
+        res.json({ message : "USer Added successfully !" , data: savedUser});
     }
     catch (err) {
         res.status(400).send(err.message);
@@ -44,11 +52,16 @@ authRouter.post("/login", async (req, res) => {
          
                 if (isPasswordValid) {
 
-                    //  Create a JWT Token
+//  Create a JWT Token
                  const token = await user.getJWT();
                 
-                 res.cookie("token" , token, { expires: new Date(Date.now() + 8 * 3600000)});
-                    res.send("Login Successful!!!");
+                 res.cookie("token" , token, { 
+                    expires: new Date(Date.now() + 8 * 3600000),
+                    sameSite: "lax",
+                    secure: false,
+                    httpOnly: true
+                 });
+                    res.send(user);
 
                 }
                 else {
